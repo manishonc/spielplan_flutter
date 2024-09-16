@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'edge_functions_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SupabaseService {
   final SupabaseClient client = Supabase.instance.client;
@@ -32,9 +33,9 @@ class SupabaseService {
   }
 
   Future<AuthResponse> signInWithOAuth(OAuthProvider provider) async {
-    final redirectUrl = kIsWeb
-        ? '${Uri.base.origin}/auth-callback'
-        : 'io.supabase.flutter://reset-callback/';
+    final host = await getCurrentHost();
+    final redirectUrl =
+        kIsWeb ? '${host}auth-callback' : '$host://reset-callback/';
 
     await client.auth.signInWithOAuth(
       provider,
@@ -42,5 +43,15 @@ class SupabaseService {
     );
 
     return AuthResponse(session: client.auth.currentSession);
+  }
+}
+
+Future<String> getCurrentHost() async {
+  if (kIsWeb) {
+    final uri = Uri.base;
+    return '${uri.scheme}://${uri.host}/';
+  } else {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo.packageName;
   }
 }

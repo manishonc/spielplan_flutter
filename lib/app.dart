@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:spielplan/screens/auth/auth_screen.dart';
-import 'screens/auth/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/supabase_service.dart';
 

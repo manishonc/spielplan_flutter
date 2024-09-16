@@ -18,10 +18,14 @@ class AuthScreenState extends State<AuthScreen> {
   String _email = '';
   String _password = '';
   final _supabaseService = SupabaseService();
+  bool _isLoading = false;
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save(); // Save the form fields
+      setState(() {
+        _isLoading = true;
+      });
+      _formKey.currentState!.save();
       try {
         if (_isLogin) {
           await _login();
@@ -39,6 +43,10 @@ class AuthScreenState extends State<AuthScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.toString()}')),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -194,7 +202,7 @@ class AuthScreenState extends State<AuthScreen> {
                                     ),
                                   const SizedBox(height: 20),
                                   ElevatedButton(
-                                    onPressed: _submitForm,
+                                    onPressed: _isLoading ? null : _submitForm,
                                     style: ElevatedButton.styleFrom(
                                       minimumSize:
                                           const Size(double.infinity, 50),
@@ -202,7 +210,18 @@ class AuthScreenState extends State<AuthScreen> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                     ),
-                                    child: Text(_isLogin ? 'Login' : 'Sign Up'),
+                                    child: _isLoading
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.white),
+                                            ),
+                                          )
+                                        : Text(_isLogin ? 'Login' : 'Sign Up'),
                                   ),
                                   const SizedBox(height: 10),
                                   TextButton(
