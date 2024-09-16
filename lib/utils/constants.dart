@@ -1,4 +1,4 @@
-const bool useLocalEnvironment = true;
+const bool useLocalEnvironment = false;
 
 const String localSupabaseUrl = 'http://127.0.0.1:54321';
 const String localSupabaseAnonKey =
